@@ -25,7 +25,9 @@ def IN_PYTHON():
 
 pl.figure()
 result = np.loadtxt("RESULT.txt")
-pl.plot(result[:,0],result[:,1], marker='.',label="FFTW")
+pl.plot(result[:, 0], result[:, 1], marker='.', label="FFTW")
+pl.xlabel("frequency (Hz)")
+pl.ylabel("Amplitude")
 # pl.xlim(80,80.01)
 # IN_PYTHON()
 pl.savefig('f.png')
