@@ -1,4 +1,4 @@
-def find_frequencies(self, x, y, I, fs, method='welch'):
+def find_frequencies(x, y, I, fs, method='welch'):
         if method == 'FFT':
             from scipy.fftpack import fft
             N = len(x)

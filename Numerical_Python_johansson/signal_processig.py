@@ -10,13 +10,13 @@ from scipy import signal
 from scipy import fftpack
 
 
-def signal_samples(t):
-    return (2 * np.sin(2 * pi * t) + 3 * np.sin(22 * 2 * pi * t) +
+def signal_samples(t, nu0=1.0, nu1=22.0):
+    return (2 * np.sin(2 * pi * t * nu0) + 3.0 * np.sin(2 * pi * t * nu1) +
             2 * np.random.randn(*np.shape(t)))
 
 
 # ------------------------------------------------------------------#
-B = 30.0
+B = 30.0 # max freqeuency to be measured.
 f_s = 2 * B
 delta_f = 0.01
 N = int(f_s / delta_f)
@@ -33,7 +33,7 @@ def plot_1():
     ax[1].plot(t, f_t)
     ax[1].set_xlim(0, 5)
     ax[1].set_xlabel("Time (s)")
-    fig.savefig("data/ch17-signal.png")
+    fig.savefig("data/ch17-1-signal.png")
     fig.tight_layout()
     pl.close()
 
@@ -44,7 +44,6 @@ F = fftpack.fft(f_t)
 f = fftpack.fftfreq(N, 1.0 / f_s)
 mask = np.where(f >= 0)
 
-
 def plot_2():
     fig, ax = pl.subplots(3, 1, figsize=(8, 6))
     ax[0].plot(f[mask], np.log(abs(F[mask])), label="real")
@@ -52,19 +51,22 @@ def plot_2():
     ax[0].set_xlim(0, 30)
     ax[0].set_ylabel("$\log(|F|)$", fontsize=14)
 
-    ax[1].plot(f[mask], abs(F[mask])/N, label="real")
+    ax[1].plot(f[mask], 2.0 * abs(F[mask])/N, label="real")
     ax[1].set_xlim(0, 2)
-    ax[1].set_ylabel("$|F|/N$", fontsize=14)
+    ax[1].set_ylabel("2$|F|/N$", fontsize=14)
 
-    ax[2].plot(f[mask], abs(F[mask])/N, label="real")
+    ax[2].plot(f[mask], 2.0 * abs(F[mask])/N, label="real")
     ax[2].set_xlim(19, 23)
     ax[2].set_xlabel("frequency (Hz)", fontsize=14)
-    ax[2].set_ylabel("$|F|/N$", fontsize=14)
+    ax[2].set_ylabel("2$|F|/N$", fontsize=14)
+    for i in range(3):
+        ax[i].legend()
 
     fig.tight_layout()
-    fig.savefig("data/ch17-simulated-signal-spectrum.png")
+    fig.savefig("data/ch17-2-simulated-signal-spectrum.png")
     pl.close()
 
+# plot_2()
 # ------------------------------------------------------------------#
 # Frequency-domain Filter
 
