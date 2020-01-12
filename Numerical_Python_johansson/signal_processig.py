@@ -10,13 +10,20 @@ from scipy import signal
 from scipy import fftpack
 
 
-def signal_samples(t, nu0=1.0, nu1=22.0):
-    return (2 * np.sin(2 * pi * t * nu0) + 3.0 * np.sin(2 * pi * t * nu1) +
-            2 * np.random.randn(*np.shape(t)))
+def signal_samples(t,
+                   nu0=1.0,
+                   nu1=22.0,
+                   amp0=2.0,
+                   amp1=3.0,
+                   noiseAmp=2.0):
+    
+    return (amp0 * np.sin(2 * pi * t * nu0) +
+            amp1 * np.sin(2 * pi * t * nu1) +
+            noiseAmp * np.random.randn(*np.shape(t)))
 
 
 # ------------------------------------------------------------------#
-B = 30.0 # max freqeuency to be measured.
+B = 30.0  # max freqeuency to be measured.
 f_s = 2 * B
 delta_f = 0.01
 N = int(f_s / delta_f)
@@ -43,6 +50,7 @@ def plot_1():
 F = fftpack.fft(f_t)
 f = fftpack.fftfreq(N, 1.0 / f_s)
 mask = np.where(f >= 0)
+
 
 def plot_2():
     fig, ax = pl.subplots(3, 1, figsize=(8, 6))
@@ -87,6 +95,7 @@ def plot_3():
     fig.savefig("data/ch17-inverse-fft.png")
     pl.close()
 # ------------------------------------------------------------------#
+# plot_3()
 
 # Windowing
 
@@ -94,17 +103,20 @@ def plot_3():
 def plot_4():
     N = 100
     fig, ax = plt.subplots(1, 1, figsize=(8, 3))
-    ax.plot(signal.blackman(N), label="Blackman")
-    ax.plot(signal.hann(N), label="Hann")
-    ax.plot(signal.hamming(N), label="Hamming")
-    ax.plot(signal.gaussian(N, N/5), label="Gaussian (std=N/5)")
-    ax.plot(signal.kaiser(N, 7), label="Kaiser (beta=7)")
+    colors = pl.cm.plasma(np.linspace(0, 1, 6))
+    ax.plot(signal.blackman(N), label="Blackman", color=colors[1])
+    ax.plot(signal.hann(N), label="Hann", color=colors[2])
+    ax.plot(signal.hamming(N), label="Hamming", color=colors[3])
+    ax.plot(signal.gaussian(N, N/5), label="Gaussian (std=N/5)", color=colors[4])
+    ax.plot(signal.kaiser(N, 7), label="Kaiser (beta=7)", color=colors[5])
     ax.set_xlabel("n")
+    ax.set_xlim(0, N)
     ax.legend(loc=0)
     fig.tight_layout()
-    fig.savefig("data/ch17-window-functions.png")
+    fig.savefig("data/ch17-4-window-functions.png", dpi=150)
     pl.close()
 # ------------------------------------------------------------------#
+# plot_4()
 
 
 df = pd.read_csv('data/temperature_outdoor_2014.tsv',
