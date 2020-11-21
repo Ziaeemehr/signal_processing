@@ -16,7 +16,7 @@ def signal_samples(t,
                    amp0=2.0,
                    amp1=3.0,
                    noiseAmp=2.0):
-    
+
     return (amp0 * np.sin(2 * pi * t * nu0) +
             amp1 * np.sin(2 * pi * t * nu1) +
             noiseAmp * np.random.randn(*np.shape(t)))
@@ -40,8 +40,8 @@ def plot_1():
     ax[1].plot(t, f_t)
     ax[1].set_xlim(0, 5)
     ax[1].set_xlabel("Time (s)")
-    fig.savefig("data/ch17-1-signal.png")
     fig.tight_layout()
+    fig.savefig("data/ch17-1-signal.png")
     pl.close()
 
 # ------------------------------------------------------------------#
@@ -107,7 +107,8 @@ def plot_4():
     ax.plot(signal.blackman(N), label="Blackman", color=colors[1])
     ax.plot(signal.hann(N), label="Hann", color=colors[2])
     ax.plot(signal.hamming(N), label="Hamming", color=colors[3])
-    ax.plot(signal.gaussian(N, N/5), label="Gaussian (std=N/5)", color=colors[4])
+    ax.plot(signal.gaussian(N, N/5),
+            label="Gaussian (std=N/5)", color=colors[4])
     ax.plot(signal.kaiser(N, 7), label="Kaiser (beta=7)", color=colors[5])
     ax.set_xlabel("n")
     ax.set_xlim(0, N)
@@ -131,7 +132,7 @@ time = df.index.astype('int') / 1e9
 
 temperature = df.temperature.values
 temperature_detrended = signal.detrend(temperature)
-window = signal.blackman(len(temperature_detrended))
+window = signal.blackman(len(temperature))
 temperature_windowed = temperature * window
 data_fft = fftpack.fft(temperature)
 data_fft_detrended = fftpack.fft(temperature_detrended)
@@ -146,9 +147,10 @@ def plot_5():
     ax.set_ylabel("temperature", fontsize=14)
     ax.legend(loc=0)
     fig.tight_layout()
-    fig.savefig("data/ch17-temperature-signal.png")
+    fig.savefig("data/ch17-5-temperature-signal.png")
     pl.close()
 # ------------------------------------------------------------------#
+# plot_5()
 
 
 f = fftpack.fftfreq(len(temperature_windowed), time[1]-time[0])
@@ -157,28 +159,29 @@ mask = f > 0
 
 def plot_6():
     fig, ax = plt.subplots(figsize=(12, 4))
-    ax.set_xlim(0.000001, 0.000025)
+    # ax.set_xlim(0.000001, 0.000025)
     # ax.set_xlim(0.000005, 0.000018)
     ax.set_xlim(0.000005, 0.00004)
 
     ax.axvline(1./86400, color='r', lw=0.5)
     ax.axvline(2./86400, color='r', lw=0.5)
     ax.axvline(3./86400, color='r', lw=0.5)
-    ax.plot(f[mask], np.log(abs(data_fft[mask]) ** 2),
-            lw=2, label="original")
-    ax.plot(f[mask], np.log(abs(data_fft_detrended[mask])**2),
-            lw=2, label="detrended")
-    ax.plot(f[mask], np.log(abs(data_fft_windowed[mask])**2),
-            lw=2, label="windowed")
+    ax.plot(f[mask], np.log(abs(data_fft[mask])),
+            lw=2, label="original", alpha=0.3, color="k")
+    # ax.plot(f[mask], np.log(abs(data_fft_detrended[mask])),
+    #         lw=2, label="detrended", alpha=0.7, color="orange")
+    ax.plot(f[mask], np.log(abs(data_fft_windowed[mask])),
+            lw=2, label="windowed", alpha=1, color="green")
 
     ax.set_ylabel("$\log|F|$", fontsize=14)
     ax.set_xlabel("frequency (Hz)", fontsize=14)
     ax.legend(loc=0)
     fig.tight_layout()
-    fig.savefig("data/ch17-temperature-spectrum.png")
+    fig.savefig("data/ch17-6-temperature-spectrum.png")
     pl.close()
 
 
+# plot_6()
 # ------------------------------------------------------------------#
 # Spectrogram of Guitar sound
 sample_rate, data = io.wavfile.read("data/guitar.wav")
@@ -186,11 +189,11 @@ sample_rate, data = io.wavfile.read("data/guitar.wav")
 # print sample_rate
 # print data.shape
 data = data.mean(axis=1)
-# print data.shape[0] / float(sample_rate)
+# print data.shape[0] / float(sample_rate) # total duration of the audio recording
 
+# analyze 0.5 seconds --------------------------------------
 N = int(sample_rate / 2.0)
-# print N
-f = fftpack.fftfreq(N, 1.0/sample_rate)
+f = fftpack.fftfreq(N, 1.0 / sample_rate)
 t = np.linspace(0, 0.5, N)
 mask = (f > 0) * (f < 1000)
 subdata = data[:N]
@@ -200,20 +203,21 @@ F = fftpack.fft(subdata)
 def plot_7():
     fig, ax = plt.subplots(1, 2, figsize=(12, 3))
     ax[0].plot(t, subdata)
-    ax[1].plot(f[mask], abs(F[mask]))
+    ax[1].plot(f[mask], abs(F[mask])/N)
 
     ax[0].set_ylabel("signal", fontsize=14)
     ax[0].set_xlabel("time (s)", fontsize=14)
-    ax[1].set_ylabel("$|F|$", fontsize=14)
+    ax[1].set_ylabel("$|F|/N$", fontsize=14)
     ax[1].set_xlabel("Frequency (Hz)", fontsize=14)
     ax[1].set_xlim(0, 1000)
     fig.tight_layout()
-    fig.savefig("data/ch17-guitar-spectrum.png")
+    fig.savefig("data/ch17-7-guitar-spectrum.png")
     pl.close()
 
 
 # plot_7()
 # ------------------------------------------------------------------#
+# N is number of data point for 1 segment (0.5 s)
 N_max = int(data.shape[0] / N)
 f_values = np.sum(1 * mask)
 spect_data = np.zeros((N_max, f_values))
@@ -236,7 +240,7 @@ def plot_8():
     ax.set_ylabel("time (s)", fontsize=14)
     ax.set_xlabel("Frequency (Hz)", fontsize=14)
     fig.tight_layout()
-    fig.savefig("data/ch17-spectrogram.png")
+    fig.savefig("data/ch17-8-spectrogram.png")
     pl.close()
 
 

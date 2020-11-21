@@ -1,10 +1,8 @@
-# /usr/bin/env python3
-
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.spectrogram.html
 
 import numpy as np
 from scipy import signal
-from scipy.fft import fftshift
+from scipy.fftpack import fftshift
 import matplotlib.pyplot as plt
 
 # Generate a test signal, a 2 Vrms sine wave whose frequency
