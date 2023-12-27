@@ -32,3 +32,6 @@ prog
 *.adjlist
 *.graphml
 *.gdf
+
+.DS_Store
+._.DS_Store
